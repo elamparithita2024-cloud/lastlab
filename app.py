@@ -1,10 +1,13 @@
 def calculate_total(price, quantity):
     return price * quantity
 
+def apply_discount(total, discount_percent):
+    return total * (1 - (discount_percent / 100))
+
 def main():
-    print("=== Shopping Bill Calculator ===")
+    print("=== Shopping Bill Calculator v2 (Discounts) ===")
     while True:
-        print("\n1. Calculate Bill")
+        print("\n1. Calculate Bill with Discount")
         print("2. Exit")
         choice = input("Enter choice (1-2): ")
         
@@ -12,14 +15,13 @@ def main():
             try:
                 price = float(input("Enter item price: "))
                 quantity = int(input("Enter item quantity: "))
-                if price < 0 or quantity < 0:
-                    print("Price and quantity must be positive.")
-                    continue
+                discount = float(input("Enter discount % (0-100): "))
                 
-                total = calculate_total(price, quantity)
-                print(f"Total Bill: ${total:.2f}")
+                subtotal = calculate_total(price, quantity)
+                final_total = apply_discount(subtotal, discount)
+                
+                print(f"Subtotal: ${subtotal:.2f} | Final: ${final_total:.2f}")
             except ValueError:
-                print("Invalid input! Enter numbers only.")
+                print("Invalid input.")
         elif choice == '2':
-            print("Goodbye!")
             break
