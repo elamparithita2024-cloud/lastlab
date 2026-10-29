@@ -1,0 +1,57 @@
+name: Shopping Bill Calculator Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  continuous-integration:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Check out the repository code
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Python runtime
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      # Step 3: Install dependencies (pytest)
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+
+      # Step 4: Run automated tests (Satisfies the 3rd Instruction rule)
+      - name: Run automated tests
+        run: |
+          pytest test_app.py
+
+  build-and-push:
+    needs: continuous-integration
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      # Log into Docker Hub securely using GitHub Actions Secrets
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Build and push the image using the unique Git commit hash as the tag
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/shopping-bill-calculator:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/shopping-bill-calculator:latest
+
+
